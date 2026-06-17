@@ -1,4 +1,8 @@
 class User < ApplicationRecord
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable
+  enum :role, { owner: 0, order_taker: 1, delivery_person: 2 }
+  validates :role, presence: true
   validates :name, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP } , presence: true, uniqueness: true
   validates :password,
@@ -9,12 +13,9 @@ class User < ApplicationRecord
               message: "must include at least one uppercase letter and one special character"
             }
 
-  enum role: { owner: 0, order_taker: 1, delivery_person: 2 }, validate: true, presence: true
 
   has_many :orders
   has_many :deliveries, class_name: "Order", foreign_key: "delivery_person_id"
   has_many :taken_orders, class_name: "Order", foreign_key: "order_taker_id"
-
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable
+  
 end
